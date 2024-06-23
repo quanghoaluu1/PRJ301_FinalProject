@@ -14,5 +14,10 @@
     <body>
         <c:set var="user" value="${sessionScope.login_user}"/>
         <p>Welcome ${user.user_name}</p>
+        <form action="ProductManger" method="GET">
+            <a href="productManager.jsp">Product Manager</a>
+        </form>
+            
+
     </body>
 </html>

@@ -14,5 +14,6 @@
     <body>
         <c:set var="user" value="${sessionScope.login_user}"/>
         <p>Welcome ${user.user_name}</p>
+        <a href="shoppingPage.jsp">Go SHopping</a>
     </body>
 </html>

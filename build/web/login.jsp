@@ -17,7 +17,8 @@
             Password: <input type="password" name="password"><br>
             <input type="submit" name="action" value="login">
         </form>
-        
+       
+
         <a href="register.jsp">Register</a>
     </body>
 </html>

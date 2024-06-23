@@ -44,13 +44,18 @@ public class LoginController extends HttpServlet {
         if(user != null){
             HttpSession session = request.getSession();
             session.setAttribute("login_user", user);
+            String redirectUrl = (String)session.getAttribute("redirectUrl");
+            if(redirectUrl != null){
+                session.removeAttribute("redirectUrl");
+                response.sendRedirect(redirectUrl);
+            }else{
             if(user.getRole().equals("manager") || user.getRole().equals("staff")){
                 url = Constant.STAFF_PAGE;
             }else if(user.getRole().equals("user")){
-                url = Constant.USER_PAGE;
+                url = "shoppingPage.jsp";
             }else{
             request.setAttribute("error", "Your role is not supported");
-        }
+        }}
         }else{
             request.setAttribute("error", "Incorrect user id or password");
         }
