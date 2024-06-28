@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.user.UserDTO;
 
 /**
  *
@@ -34,10 +35,13 @@ public class LogoutController extends HttpServlet {
         String url = "login.jsp";
         try{
             HttpSession session = request.getSession(false);
-            if(session != null){
+            UserDTO user = (UserDTO)session.getAttribute("login_user");
                 session.invalidate();
-                url = "login.jsp";
-            }
+                if(user.getRole().equals("staff") || user.getRole().equals("manager"))
+                                url = "login.jsp";
+                else if(user.getRole().equals("user"))
+                    url = "shop.jsp";
+            
             
         }catch(Exception e){
             e.printStackTrace();

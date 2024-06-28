@@ -9,15 +9,21 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Staff Page</title>
+        <link rel="icon" type="image/x-icon" href="images/spi_logo.png">
     </head>
     <body>
         <c:set var="user" value="${sessionScope.login_user}"/>
         <p>Welcome ${user.user_name}</p>
-        <form action="ProductManger" method="GET">
-            <a href="productManager.jsp">Product Manager</a>
+        <form action="MainController">
+            <input type="submit" name="action" value="logout">
         </form>
-            
-
+       
+            <a href="productManager.jsp">Product Manager</a>
+        
+            <c:if test="${user.role == 'manager'}">
+        <a href="userManager.jsp">User Manager</a>
+            </c:if>
+         
     </body>
 </html>

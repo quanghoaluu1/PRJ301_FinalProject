@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import model.utils.DBUtils;
 
 /**
@@ -70,4 +72,63 @@ public class UserDAO {
         }
         return check;
     }
+    
+   public List<UserDTO> getUserByName(String name){
+       String sql = "select * from users where user_name like ?";
+       List<UserDTO> list = new ArrayList<>();
+       try(Connection conn = DBUtils.getConnection();
+               PreparedStatement ptm = conn.prepareStatement(sql)){
+           ptm.setString(1, '%' + name +'%');
+           ResultSet rs = ptm.executeQuery();
+           while(rs.next()){
+               list.add(new UserDTO(rs.getString("user_id"), rs.getString("user_name"), rs.getString("role"), rs.getString("password")));
+           }
+       }catch(Exception e){
+           System.out.println(e.getMessage());
+       }
+       return list;
+   }
+   public List<UserDTO> getAllUser(){
+       String sql = "select * from users";
+       List<UserDTO> list = new ArrayList<>();
+       try(Connection conn = DBUtils.getConnection();
+               PreparedStatement ptm = conn.prepareStatement(sql)){
+           ResultSet rs = ptm.executeQuery();
+           while(rs.next()){
+               list.add(new UserDTO(rs.getString("user_id"), rs.getString("user_name"), rs.getString("role"), rs.getString("password")));
+           }
+       }catch(Exception e){
+           System.out.println(e.getMessage());
+       }
+       return list;
+   
+   }
+   
+   public boolean deleteUser(String id){
+       String sql = "delete from users where user_id = ?";
+       boolean check = false;
+        try(Connection conn = DBUtils.getConnection();
+               PreparedStatement ptm = conn.prepareStatement(sql)){
+           ptm.setString(1, id);
+           check = ptm.executeUpdate() > 0;
+       }catch(Exception e){
+           System.out.println(e.getMessage());
+       }
+        return check;
+   }
+   
+   public boolean editUser(UserDTO user){
+       String sql = "update users set user_name = ?, role = ? where user_id = ?";
+       boolean check = false;
+       try(Connection conn = DBUtils.getConnection();
+               PreparedStatement ptm = conn.prepareStatement(sql)){
+           ptm.setString(1, user.getUser_name());
+           ptm.setString(2, user.getRole());
+           ptm.setString(3, user.getUser_id());
+           check = ptm.executeUpdate() > 0;
+       }catch(Exception e){
+           System.out.println(e.getMessage());
+       }
+       return check;
+   }
 }

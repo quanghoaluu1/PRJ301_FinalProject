@@ -71,6 +71,14 @@ public class MainController extends HttpServlet {
     private static final String REMOVE_FROM_WISH_LIST = "remove wish list";
     private static final String REMOVE_FROM_WISH_LIST_CONTROLLER = "RemoveFromWishList";
 
+    private static final String CHECK_OUT = "check out";
+    private static final String CHECK_OUT_CONTROLLER = "CheckOutController";
+    
+    private static final String EDIT_USER = "edit user";
+    private static final String EDIT_USER_CONTROLLER = "EditUserController";
+    
+    private static final String DELETE_USER = "delete user";
+    private static final String DELETE_USER_CONTROLLER = "DeleteUserController";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -124,6 +132,15 @@ public class MainController extends HttpServlet {
                     break;
                 case REMOVE_FROM_WISH_LIST:
                     url = REMOVE_FROM_WISH_LIST_CONTROLLER;
+                    break;
+                case CHECK_OUT:
+                    url = CHECK_OUT_CONTROLLER;
+                    break;
+                case EDIT_USER:
+                    url = EDIT_USER_CONTROLLER;
+                    break;
+                case DELETE_USER:
+                    url = DELETE_USER_CONTROLLER;
                     break;
                 default:
                     request.setAttribute("error", "your action not support");

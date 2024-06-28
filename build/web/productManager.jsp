@@ -15,18 +15,20 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta charset="utf-8">
-        <title>JSP Page</title>
+        <title>Product Manager</title>
+        <link rel="icon" type="image/x-icon" href="images/spi_logo.png">
     </head>
     <body>
         <%
-            String search = request.getParameter("search");
+            String search_name = request.getParameter("search-name");
             String search_cate = request.getParameter("search-cate");
             String min_price = request.getParameter("min-price");
             String max_price = request.getParameter("max-price");
             String search_brand = request.getParameter("search-brand");
+            String sort = request.getParameter("sort");
 
-            if (search == null) {
-                search = "";
+            if (search_name == null) {
+                search_name = "";
             }
             if (search_cate == null) {
                 search_cate = "";
@@ -40,9 +42,12 @@
             if (search_brand == null) {
                 search_brand = "";
             }
+            if (sort == null){
+                sort = "";
+            }
         %>
         <form action="SearchProductController" method="GET">
-            <input type="text" name="search" value="<%=search%>">
+            <input type="text" name="search-name" value="<%=search_name%>">
 
             <select name="search-cate">
                 <option value="">Select Category</option>
@@ -64,7 +69,15 @@
 
             <input type="number" step="0.01" name="min-price" value="<%= min_price%>" placeholder="Min Price" >   
             <input type="number" step="0.01" name="max-price" value="<%= max_price%>" placeholder="Max Price" >
-            <input type="submit" name="action" value="search">
+            
+            <select name="sort">
+                <option value="">Sort By</option>
+                <option value="name-asc" <%= "name-asc".equals(sort) ? "selected" : ""%>>Name A-Z</option>
+                <option value="name-desc" <%= "name-desc".equals(sort) ? "selected" : ""%>>Name Z-A</option>
+                <option value="price-asc" <%= "price-asc".equals(sort) ? "selected" : ""%>>Price Ascending</option>
+                <option value="price-desc" <%= "price-desc".equals(sort) ? "selected" : ""%>>Price Descending</option>
+            </select>
+            <input type="submit" name="get" value="search">
             <input type="reset" value="reset">
         </form>
         <a href="addProduct.jsp">Add Product</a>
@@ -134,5 +147,6 @@
                 </tr>
             </tbody>
         </table>
+                <a href="staff.jsp">Back to staff page</a>
     </body>
 </html>

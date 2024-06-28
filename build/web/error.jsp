@@ -9,10 +9,12 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>ERROR Page</title>
+        <link rel="icon" type="image/x-icon" href="images/spi_logo.png">
     </head>
     <body>
         <strong>Something's wrong</strong>
         <p>${requestScope.error}</p>
+      
     </body>
 </html>

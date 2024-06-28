@@ -34,7 +34,7 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = Constant.ERROR_PAGE;
+        String url = "login.jsp";
         
         try{
             String user_id = request.getParameter("user_id");
@@ -52,7 +52,7 @@ public class LoginController extends HttpServlet {
             if(user.getRole().equals("manager") || user.getRole().equals("staff")){
                 url = Constant.STAFF_PAGE;
             }else if(user.getRole().equals("user")){
-                url = "shoppingPage.jsp";
+                url = "shop.jsp";
             }else{
             request.setAttribute("error", "Your role is not supported");
         }}

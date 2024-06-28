@@ -9,16 +9,35 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Login Page</title>
+        <link rel="icon" type="image/x-icon" href="images/spi_logo.png">
+        <link rel="stylesheet" type="text/css" href="css/login.css">
     </head>
     <body>
+        <div class="login-box">
         <form action="MainController" method="POST">
-            User ID: <input type="text" name="user_id"><br>
-            Password: <input type="password" name="password"><br>
-            <input type="submit" name="action" value="login">
+            <p>Login</p>
+            <div class="user-box">
+                <input required="" name="user_id" type="text">
+                <label>User ID</label>
+            </div>
+            <div class="user-box">
+                <input required="" name="password" type="password">
+                <label>Password</label>
+            </div>
+            <p style="color: red;">${error}</p>
+            <input type="hidden" name="action" value="login">
+                <button>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Login
+                </button>
         </form>
-       
 
-        <a href="register.jsp">Register</a>
+
+        <p>Don't have an account? <a href="register.jsp" class="a2">Sign up!</a></p>
+        </div>
     </body>
 </html>

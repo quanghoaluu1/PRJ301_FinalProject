@@ -54,13 +54,15 @@ public class EditProductController extends HttpServlet {
             String fileName = null;
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                InputStream fileContent = filePart.getInputStream();
                 File uploads = new File(getServletContext().getRealPath("/") + "/images");
                 if (!uploads.exists()) {
                     uploads.mkdirs();
                 }
                 File file = new File(uploads, fileName);
-                Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                try (InputStream fileContent = filePart.getInputStream()) {
+                    Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                filePart.delete();
             }
             
             ProductDAO dao = new ProductDAO();

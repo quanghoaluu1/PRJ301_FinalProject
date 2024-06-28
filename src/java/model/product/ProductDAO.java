@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.utils.DBUtils;
@@ -20,15 +21,15 @@ import model.utils.DBUtils;
  */
 public class ProductDAO {
 
-    public static void main(String[] args) {
-        String brand = "others";
-        List<ProductDTO> list = getByCriteria(null, null, null, null, brand);
-        for(ProductDTO prod: list){
-            System.out.println(prod.getImage());
-            System.out.println(prod.getProd_name());
-            System.out.println(prod.getNewPrice());
-        }
-    }
+//    public static void main(String[] args) {
+//        String brand = "others";
+//        List<ProductDTO> list = getByCriteria(null, null, null, null, brand);
+//        for(ProductDTO prod: list){
+//            System.out.println(prod.getImage());
+//            System.out.println(prod.getProd_name());
+//            System.out.println(prod.getNewPrice());
+//        }
+//    }
     public boolean addProduct(String prod_id, String prod_name, String category, double price, int stock, String description, double discount, String brand, String image) {
         boolean check = false;
         String sql = "insert into products (prod_id,prod_name,category,price,stock,description,discount,brand,image) values(?,?,?,?,?,?,?,?,?)";
@@ -138,92 +139,41 @@ public class ProductDAO {
         }
         return product;
     }
+    public static void main(String[] args) {
+        String sort = "price-desc";
+        List<ProductDTO> list = getByCriteria(null, "Laptop", 0.0, 10000.0, null, null);
+        for(ProductDTO prod: list){
+            System.out.println(prod.getProd_name());
+        }
+    }
 
-    public List<ProductDTO> getProductByName(String name) {
-        String sql = "select * from products where prod_name like ?";
+    public static List<ProductDTO> getByCriteria(String name, String category, Double min_price, Double max_price, String brand, String sort) {
         List<ProductDTO> list = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ptm = conn.prepareStatement(sql);) {
-            ptm.setString(1, '%' + name + '%');
-            ResultSet rs = ptm.executeQuery();
-            while (rs.next()) {
-                String prod_id = rs.getString("prod_id");
-                String prod_name = rs.getString("prod_name");
-                String category = rs.getString("category");
-                float price = rs.getFloat("price");
-                int stock = rs.getInt("stock");
-                String description = rs.getString("description");
-                float discount = rs.getFloat("discount");
-                String brand = rs.getString("brand");
-                String image = rs.getString("image");
-                list.add(new ProductDTO(prod_id, prod_name, category, price, stock, description, discount, brand, image));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        StringBuilder sql = buildQuery();
+        appendCriteria(sql, name, category, min_price, max_price, brand);
+        appendSort(sql, sort);
+        
+        try(Connection conn = DBUtils.getConnection();
+                PreparedStatement ptm = conn.prepareStatement(sql.toString())){
+            setCriteriaParameter(ptm, name, category, min_price, max_price, brand);
+            list = executeQuery(ptm);
+        }catch(Exception e){
+            e.printStackTrace();
         }
         return list;
     }
-
-    public List<ProductDTO> getProductByCategory(String category) {
-        String sql = "select * from products where category = ?";
-        List<ProductDTO> list = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ptm = conn.prepareStatement(sql);) {
-            ptm.setString(1, category);
-            ResultSet rs = ptm.executeQuery();
-            while (rs.next()) {
-                String prod_id = rs.getString("prod_id");
-                String prod_name = rs.getString("prod_name");
-                float price = rs.getFloat("price");
-                int stock = rs.getInt("stock");
-                String description = rs.getString("description");
-                float discount = rs.getFloat("discount");
-                String brand = rs.getString("brand");
-                String image = rs.getString("image");
-                list.add(new ProductDTO(prod_id, prod_name, category, price, stock, description, discount, brand, image));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
+    private static StringBuilder buildQuery(){
+        return new StringBuilder("select * , price - (price * discount) as new_price from products where 1=1");
     }
-
-    public List<ProductDTO> getByNameAndCategory(String name, String category) {
-        String sql = "select * from products where prod_name like ? and category = ?";
-        List<ProductDTO> list = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ptm = conn.prepareStatement(sql)) {
-            ptm.setString(1, '%' + name + '%');
-            ptm.setString(2, category);
-            ResultSet rs = ptm.executeQuery();
-            while (rs.next()) {
-                String prod_id = rs.getString("prod_id");
-                String prod_name = rs.getString("prod_name");
-                float price = rs.getFloat("price");
-                int stock = rs.getInt("stock");
-                String description = rs.getString("description");
-                float discount = rs.getFloat("discount");
-                String brand = rs.getString("brand");
-                String image = rs.getString("image");
-                list.add(new ProductDTO(prod_id, prod_name, category, price, stock, description, discount, brand, image));
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
-    }
-
-    public static List<ProductDTO> getByCriteria(String name, String category, Double min_price, Double max_price, String brand) {
-        StringBuilder sql = new StringBuilder("select * from products where 1=1");
-        List<ProductDTO> list = new ArrayList<>();
+    private static void appendCriteria(StringBuilder sql, String name, String category, Double min_price, Double max_price, String brand){
         if (name != null && !name.trim().isEmpty()) {
-            sql.append(" and name like ?");
+            sql.append(" and prod_name like ?");
         }
         if (category != null && !category.trim().isEmpty()) {
             sql.append(" and category = ?");
         }
         if (min_price != null) {
-            sql.append("and price >= ?");
+            sql.append(" and price >= ?");
         }
         if (max_price != null) {
             sql.append(" and price <= ?");
@@ -235,9 +185,29 @@ public class ProductDAO {
                 sql.append(" and brand = ?");
             }
         }
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ptm = conn.prepareStatement(sql.toString())) {
-            int index = 1;
+    }
+    
+    private static void appendSort(StringBuilder sql, String sort){
+        if(sort!=null && !sort.trim().isEmpty()){
+            switch(sort){
+                case "name-asc":
+                    sql.append(" order by prod_name asc");
+                    break;
+                case "name-desc":
+                    sql.append(" order by prod_name desc");
+                    break;
+                case "price-asc":
+                    sql.append(" order by new_price asc");
+                    break;
+                case "price-desc":
+                    sql.append(" order by new_price desc");
+                    break;
+            }
+        }
+    }
+    
+    private static void setCriteriaParameter(PreparedStatement ptm, String name, String category, Double min_price, Double max_price, String brand ) throws SQLException{
+         int index = 1;
             if (name != null && !name.trim().isEmpty()) {
                 ptm.setString(index++, '%' + name + '%');
             }
@@ -253,8 +223,13 @@ public class ProductDAO {
             if (brand != null && !brand.trim().isEmpty() && !"others".equals(brand)) {
                 ptm.setString(index++, brand);
             }
-            ResultSet rs = ptm.executeQuery();
-            while (rs.next()) {
+    }
+    
+    private static List<ProductDTO> executeQuery(PreparedStatement ptm) throws SQLException{
+        List<ProductDTO> list = new ArrayList<>();
+        
+        try (ResultSet rs = ptm.executeQuery();){
+           while (rs.next()) {
                 String prodId = rs.getString("prod_id");
                 String prodName = rs.getString("prod_name");
                 String prodCategory = rs.getString("category");
@@ -273,7 +248,6 @@ public class ProductDAO {
         }
         return list;
     }
-
     public double setDecimal(double value) {
         BigDecimal valueRounded = new BigDecimal(value).setScale(2, RoundingMode.HALF_UP);
         value = valueRounded.doubleValue();

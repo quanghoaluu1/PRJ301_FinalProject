@@ -27,18 +27,7 @@ public class CartDAO {
     public CartDAO() {
 
     }
-    public void main(String[] args) {
-         String user_id ="duy";
-        try{
-           for(CartDTO item: getItems(user_id)){
-               System.out.println(item.getProd_id());
-               System.out.println(item.getQuantity());
-           }
-        }catch(Exception e){
-                System.out.println(e.getMessage());
-                }
-        
-    }
+
 
     public void addItem(String user_id, String prod_id, int quantity) throws SQLException {
 
@@ -57,21 +46,23 @@ public class CartDAO {
         ptm.close();
     }
 
-    public void updateItems(String user_id, String prod_id, int quantity) throws SQLException {
+    public boolean updateItems(String user_id, String prod_id, int quantity) throws SQLException {
 
         String sql = "update carts set quantity = ? where user_id = ? and prod_id = ?";
+        boolean check = false;
         try {
             conn = DBUtils.getConnection();
             ptm = conn.prepareStatement(sql);
             ptm.setInt(1, quantity);
             ptm.setString(2, user_id);
             ptm.setString(3, prod_id);
-            ptm.executeUpdate();
+            check = ptm.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         conn.close();
         ptm.close();
+        return check;
     }
 
     public void removeItem(String user_id, String prod_id) throws SQLException {
@@ -108,6 +99,25 @@ public class CartDAO {
         conn.close();
         ptm.close();
         return items;
+    }
+    
+    public int getItemQuantity(String user_id) throws SQLException{
+        String sql = "select sum(quantity) as total_quantity from carts where user_id = ?";
+        int total_quantity = 0;
+                try{
+                    conn = DBUtils.getConnection();
+                    ptm = conn.prepareStatement(sql);
+                    ptm.setString(1, user_id);
+                    ResultSet rs = ptm.executeQuery();
+                    if(rs.next()){
+                        total_quantity = rs.getInt("total_quantity");
+                    }
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                }
+                conn.close();
+                ptm.close();
+                return total_quantity;
     }
 
     public void clearItems(String user_id) throws SQLException {

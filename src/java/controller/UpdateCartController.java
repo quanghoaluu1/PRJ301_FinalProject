@@ -41,7 +41,12 @@ public class UpdateCartController extends HttpServlet {
             String prod_id = request.getParameter("prod-id");
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             CartDAO dao = new CartDAO();
-            dao.updateItems(user_id, prod_id, quantity);
+            boolean check = dao.updateItems(user_id, prod_id, quantity);
+            if(check){
+                System.out.println("update success");
+            }else{
+                System.out.println("failed");
+            }
             url = "cart.jsp";
         }catch(Exception e){
             log(e.getMessage());

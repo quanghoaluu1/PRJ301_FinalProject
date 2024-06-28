@@ -39,11 +39,11 @@ public class AddToWishListController extends HttpServlet {
             String msg;
             if(dao.isInWishList(user_id, prod_id)){
                 msg = "Product is already in your wish list";
-                url = "shoppingPage.jsp";
+                url = "shop.jsp";
             }else{
                 if(dao.addToWishList(user_id, prod_id)){
                     msg = "Add to wish successfully";
-                url = "shoppingPage.jsp";
+                url = "shop.jsp";
                 }else
                     msg = "Add to wish failed";
                 }

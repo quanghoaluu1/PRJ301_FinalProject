@@ -37,7 +37,7 @@ public class SearchProductController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = constants.Constant.ERROR_PAGE;
-        String action = request.getParameter("action");
+        String action = request.getParameter("get");
         ProductDAO dao = new ProductDAO();
         List<ProductDTO> list = new ArrayList<>();
         
@@ -45,17 +45,18 @@ public class SearchProductController extends HttpServlet {
         UserDTO user = (UserDTO)session.getAttribute("login_user");
         try{
             if("search".equals(action)){
-                String search = request.getParameter("search");
+                String search_name = request.getParameter("search-name");
                 String search_cate = request.getParameter("search-cate");
                 String min_price_para = request.getParameter("min-price");
                 String max_price_para = request.getParameter("max-price");
                 String search_brand = request.getParameter("search-brand");
+                String sort = request.getParameter("sort");
+                Double min_price = parseDoublePara(min_price_para);
+                Double max_price = parseDoublePara(max_price_para);
                 
-                Double min_price = min_price_para != null && !min_price_para.isEmpty() ? Double.parseDouble(min_price_para) : null;
-                Double max_price = max_price_para != null && !max_price_para.isEmpty() ? Double.parseDouble(max_price_para) : null;
-                
-                if((search != null && !search.trim().isEmpty()) || (search_cate != null && !search_cate.trim().isEmpty()) || (min_price != null) || (max_price != null) || (search_brand != null && !search_brand.trim().isEmpty())){
-                    list = dao.getByCriteria(search, search_cate, min_price, max_price, search_brand);
+                if(hasSearchCriteria(search_name, search_cate, min_price, max_price, search_brand, sort)){
+                   list = dao.getByCriteria(search_name, search_cate, min_price, max_price, search_brand, sort);
+                    System.out.println(list);
                 }else{
                     list = dao.getAllProduct();
                 }
@@ -63,15 +64,39 @@ public class SearchProductController extends HttpServlet {
                     request.setAttribute("product_list", list);
                 }
                 if(user == null || "user".equals(user.getRole())){
-                    url = "shoppingPage.jsp";
+                    url = "shop.jsp";
                 }else if("staff".equals(user.getRole()) || "manager".equals(user.getRole())){
                     url = "productManager.jsp";
                 }
+//                for(ProductDTO prod : list){
+//                    System.out.println(prod.getProd_name());
+//                }
             }
         }catch(Exception e){
             e.printStackTrace();
+            request.setAttribute("error", e);
         }
         request.getRequestDispatcher(url).forward(request, response);
+    }
+    
+    private Double parseDoublePara(String para){
+        if(para != null && !para.trim().isEmpty()){
+            try{
+                return Double.parseDouble(para);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+    
+    private boolean hasSearchCriteria(String name, String category, Double min_pirce, Double max_price, String brand, String sort){
+        return (name != null && !name.trim().isEmpty()||
+                category != null && !category.trim().isEmpty()||
+                min_pirce != null||
+                max_price != null||
+                brand != null && !brand.trim().isEmpty() ||
+                sort != null && !sort.trim().isEmpty());
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
