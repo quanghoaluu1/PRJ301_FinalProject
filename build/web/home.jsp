@@ -197,7 +197,7 @@
                 <div class="container">
                     <div class="row align-items-start align-items-md-center justify-content-end">
                         <div class="col-md-5 text-center text-md-left pt-5 pt-md-0">
-                            <h1 class="mb-2">Find Your Powerful Gaming PC</h1>
+                            <h1 class="mb-2">Find Your Ultimate Gaming PC</h1>
                             <div class="intro-text text-center text-md-left">
                                 <p>
                                     <a href="shop.jsp" class="btn btn-sm btn-primary">Shop Now</a>
